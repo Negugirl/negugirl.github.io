@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Simple Site Proxy</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:system-ui,Arial;background:#0f172a;color:#e6eef8;margin:0;min-height:100vh}
+    .top{padding:16px;display:flex;gap:8px;align-items:center;background:#071030}
+    input[type="text"]{flex:1;padding:10px;border-radius:6px;border:1px solid #213a5a;background:#071f34;color:#fff}
+    button{padding:10px 12px;border-radius:6px;border:0;background:#1e90ff;color:#fff;cursor:pointer}
+    iframe{width:100%;height:calc(100vh - 72px);border:0}
+    .note{font-size:13px;color:#9fb3d6;margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <input id="url" placeholder="Enter full URL: https://www.example.com/path" value="">
+    <button id="go">Load</button>
+    <button id="openStandalone">Open proxied page in new tab</button>
+  </div>
+  <div style="padding:8px 16px" class="note">
+    For best results use a full https URL that begins with https://www. — server-side CORS is handled by the proxy.
+  </div>
+  <iframe id="frame" src=""></iframe>
+
+  <script>
+    const go = document.getElementById('go');
+    const input = document.getElementById('url');
+    const iframe = document.getElementById('frame');
+    const openBtn = document.getElementById('openStandalone');
+
+    function makeProxyUrl(u){
+      return '/proxy?url=' + encodeURIComponent(u);
+    }
+
+    go.onclick = () => {
+      const v = input.value.trim();
+      if (!v) return alert('Enter URL first');
+      // basic validation
+      try {
+        const parsed = new URL(v);
+        if (parsed.protocol !== 'https:') return alert('Only https URLs allowed');
+      } catch(e){ return alert('Invalid URL'); }
+      iframe.src = makeProxyUrl(v);
+    };
+
+    openBtn.onclick = () => {
+      const v = input.value.trim();
+      if (!v) return alert('Enter URL first');
+      const prox = makeProxyUrl(v);
+      window.open(prox, '_blank');
+    };
+  </script>
+</body>
+</html>
